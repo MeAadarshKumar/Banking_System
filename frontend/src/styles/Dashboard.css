@@ -1,0 +1,319 @@
+/* =========================================
+   1. GLOBAL RESET & BASE
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Montserrat', sans-serif; 
+}
+
+body { 
+    background-color: #f0f2f5; 
+    color: #1c1e21; 
+    line-height: 1.6; 
+}
+
+/* =========================================
+   2. NAVBAR & NAVIGATION
+   ========================================= */
+.navbar {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    padding: 18px 60px; 
+    background: #1a1a2e; 
+    color: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+    position: sticky; 
+    top: 0; 
+    z-index: 1000;
+}
+
+.nav-brand { 
+    font-size: 22px; 
+    font-weight: 700; 
+    letter-spacing: 1.5px; 
+}
+
+.nav-links { 
+    display: flex; 
+    list-style: none; 
+    gap: 25px; 
+    align-items: center; 
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links li { 
+    display: flex;
+    list-style: none; 
+}
+
+.nav-links a, .nav-link-btn {
+    text-decoration: none; 
+    color: #e0e0e0; 
+    font-size: 14px; 
+    font-weight: 500;
+    background: none; 
+    border: none; 
+    cursor: pointer; 
+    transition: 0.3s;
+}
+
+.nav-links a:hover, .nav-link-btn:hover { 
+    color: #4cc9f0; 
+}
+
+.logout-btn {
+    background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+    color: white; 
+    border: none; 
+    padding: 10px 24px; 
+    border-radius: 8px;
+    cursor: pointer; 
+    font-weight: 600; 
+    text-transform: uppercase;
+    font-size: 11px; 
+    letter-spacing: 1px; 
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover { 
+    transform: translateY(-1px); 
+    box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3); 
+}
+
+/* =========================================
+   3. DASHBOARD STRUCTURE
+   ========================================= */
+.dashboard-wrapper { 
+    display: flex; 
+    flex-direction: column; 
+    min-height: 100vh; 
+}
+
+.dashboard-content { 
+    flex: 1; 
+    padding: 40px 20px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    width: 100%; 
+}
+
+.form-card-container, .user-list-container, .account-summary {
+    width: 100%; 
+    max-width: 1000px; 
+    background: white;
+    border-radius: 12px; 
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    margin: 0 auto 30px auto; 
+    overflow: hidden;
+}
+
+.form-header, .user-list-header {
+    background: #f8f9fa; 
+    padding: 30px; 
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.form-header h2, .user-list-header h2 { 
+    font-size: 26px; 
+    color: #1a1a2e; 
+    margin-bottom: 8px; 
+}
+
+.profile-id-badge {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+/* =========================================
+   4. PROFILE VIEW SPECIFIC STYLES (THE FIX)
+   ========================================= */
+.view-grid-container {
+    padding: 40px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+}
+
+.view-section {
+    background: #fafbfc;
+    padding: 25px;
+    border-radius: 10px;
+    border: 1px solid #eef0f7;
+    border-top: 4px solid #4361ee;
+}
+
+.view-section h3 {
+    font-size: 14px;
+    text-transform: uppercase;
+    color: #4361ee;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eef0f7;
+    padding-bottom: 10px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.info-grid.three-col {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.info-item span {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #999;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.info-item p {
+    font-size: 15px;
+    color: #1a1a2e;
+    font-weight: 600;
+}
+
+.two-col { grid-column: span 2; }
+
+/* =========================================
+   5. PROFESSIONAL DATA TABLE
+   ========================================= */
+.table-responsive { 
+    padding: 0 20px 20px 20px; 
+    width: 100%;
+}
+
+.professional-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    table-layout: fixed;
+}
+
+.professional-table th {
+    padding: 15px 20px;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #999;
+    letter-spacing: 1px;
+    text-align: left;
+}
+
+.professional-table tbody tr {
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    transition: all 0.2s ease;
+}
+
+.professional-table td {
+    padding: 15px 20px;
+    border-top: 1px solid #f8f9fa;
+    border-bottom: 1px solid #f8f9fa;
+    vertical-align: middle;
+}
+
+.acc-number {
+    font-family: 'Courier New', Courier, monospace;
+    background: #f1f3f5;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #4361ee;
+    font-weight: 700;
+}
+
+/* =========================================
+   6. KYC FORM GRID STYLING
+   ========================================= */
+.professional-form { padding: 40px; }
+.form-section { margin-bottom: 35px; }
+.form-section h3 {
+    font-size: 18px; color: #4361ee; margin-bottom: 20px;
+    border-bottom: 2px solid #eef0f7; padding-bottom: 10px;
+    text-transform: uppercase; letter-spacing: 1px;
+}
+
+.profile-grid { 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 20px 30px; 
+}
+
+.full-width { grid-column: span 2; }
+
+.input-group { display: flex; flex-direction: column; gap: 8px; }
+.input-group label { font-size: 13px; font-weight: 600; color: #555; }
+
+.input-group input, .input-group select {
+    padding: 12px 16px; border: 1.5px solid #dce0e4;
+    border-radius: 8px; font-size: 14px; background: #fafbfc;
+}
+
+.input-group input:focus {
+    border-color: #4361ee; outline: none;
+    box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1); 
+}
+
+/* =========================================
+   7. ANALYTICS & STATS GRID
+   ========================================= */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 30px;
+}
+
+.stat-card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #eef0f7;
+    text-align: center;
+}
+
+.stat-value { font-size: 28px; color: #1a1a2e; margin-top: 5px; }
+
+/* =========================================
+   8. BADGES & ACTION BUTTONS
+   ========================================= */
+.badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.badge.success { background: #e7fcf3; color: #089156; }
+
+.admin-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+.view-btn-small, .remove-btn-small {
+    padding: 8px 16px; border-radius: 6px; font-size: 11px;
+    font-weight: 600; cursor: pointer; border: none;
+}
+
+.view-btn-small { background: #f0f3ff; color: #4361ee; }
+.remove-btn-small { background: #fff0f0; color: #e63946; }
+
+/* =========================================
+   9. FOOTER
+   ========================================= */
+.footer { background: #1a1a2e; padding: 30px 50px; color: #b0b0b0; margin-top: auto; }
+.footer-content { display: flex; justify-content: space-between; max-width: 1200px; margin: 0 auto; font-size: 12px; }
+.social-links a { color: #4cc9f0; text-decoration: none; margin-left: 15px; }

@@ -1,0 +1,9 @@
+# Spring Boot
+/target/
+*.log
+/.idea/
+
+# React
+/node_modules/
+build/
+.env
