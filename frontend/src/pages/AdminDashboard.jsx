@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import UserProfileView from './UserProfileView';
+import DepositApprovalView from './DepositApproval';
 import '../styles/Dashboard.css';
 
-// FIX: Added 'user' to destructuring props
 const AdminDashboard = ({ onLogout, user }) => { 
     const [users, setUsers] = useState([]);
     const [pendingDeposits, setPendingDeposits] = useState([]);
@@ -13,7 +13,7 @@ const AdminDashboard = ({ onLogout, user }) => {
 
     useEffect(() => {
         if (view === 'userList') fetchUsers();
-        if (view === 'stats') fetchPending();
+        if (view === 'deposits' || view === 'stats') fetchPending();
     }, [view]);
 
     const fetchUsers = async () => {
@@ -30,91 +30,83 @@ const AdminDashboard = ({ onLogout, user }) => {
         } catch (error) { console.error("Error fetching deposits:", error); }
     };
 
-    const handleApprove = async (id) => {
+    const handleAction = async (id, action) => {
         try {
-            await axios.post(`http://localhost:8080/api/admin/approve-deposit/${id}`);
-            alert("Deposit Approved!");
+            const url = action === 'approve' 
+                ? `http://localhost:8080/api/admin/approve-deposit/${id}`
+                : `http://localhost:8080/api/admin/reject-deposit/${id}`;
+            
+            await axios.post(url);
+            alert(`Deposit ${action === 'approve' ? 'Approved' : 'Rejected'}!`);
             fetchPending();
-        } catch (error) { alert("Approval failed."); }
+        } catch (error) { 
+            // Better error logging to identify 500 errors
+            console.error("Action Error:", error.response?.data);
+            alert(`${action} failed: Internal Server Error (Check Backend Logs)`); 
+        }
     };
 
     const handleDeleteUser = async (accNo) => {
-        if (window.confirm(`Are you sure?`)) {
+        if (window.confirm(`Are you sure you want to remove account ${accNo}?`)) {
             try {
                 await axios.delete(`http://localhost:8080/api/admin/delete-user/${accNo}`);
+                alert("User removed successfully.");
                 fetchUsers();
             } catch (error) { alert("Delete failed."); }
         }
     };
-
-    const filteredUsers = users.filter(u => 
-        (u.firstName + " " + u.lastName).toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (u.accountNumber && u.accountNumber.includes(searchTerm))
-    );
 
     return (
         <div className="dashboard-wrapper">
             <nav className="navbar">
                 <div className="nav-brand">🏦 ADMIN PANEL</div>
                 <ul className="nav-links">
-                    <li><button className="nav-link-btn" onClick={() => {setView('stats'); setSelectedEmail(null);}}>Analytics</button></li>
-                    <li><button className="nav-link-btn" onClick={() => {setView('loan'); setSelectedEmail(null);}}>Loans</button></li>
-                    <li><button className="nav-link-btn" onClick={() => {setView('userList'); setSelectedEmail(null);}}>Users</button></li>
+                    <li><button className={`nav-link-btn ${view === 'stats' ? 'active' : ''}`} onClick={() => setView('stats')}>Analytics</button></li>
+                    <li><button className={`nav-link-btn ${view === 'deposits' ? 'active' : ''}`} onClick={() => setView('deposits')}>Deposits</button></li>
+                    <li><button className={`nav-link-btn ${view === 'userList' ? 'active' : ''}`} onClick={() => setView('userList')}>Users</button></li>
                     <li><button className="logout-btn" onClick={onLogout}>Logout</button></li>
                 </ul>
             </nav>
 
             <main className="dashboard-content">
-                {/* FIX: Move Profile Logic inside the content area */}
                 {selectedEmail ? (
-                    <UserProfileView 
-                        userEmail={selectedEmail} 
-                        onBack={() => setSelectedEmail(null)} 
-                    />
+                    <UserProfileView userEmail={selectedEmail} onBack={() => setSelectedEmail(null)} />
                 ) : (
                     <>
-                        {view === 'stats' && (
-                            <div className="form-card-container">
-                                <div className="form-header"><h2>Approval Queue</h2></div>
-                                <div className="table-responsive">
-                                    <table className="professional-table">
-                                        <thead>
-                                            <tr><th>Account No</th><th>Amount</th><th>Action</th></tr>
-                                        </thead>
-                                        <tbody>
-                                            {pendingDeposits.map(tx => (
-                                                <tr key={tx.id}>
-                                                    <td>{tx.receiverAccountNumber}</td>
-                                                    <td>₹{tx.amount}</td>
-                                                    <td><button className="view-btn-small" onClick={() => handleApprove(tx.id)}>Approve</button></td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                        {view === 'deposits' && (
+                            <DepositApprovalView requests={pendingDeposits} onAction={handleAction} />
                         )}
 
                         {view === 'userList' && (
                             <div className="form-card-container">
                                 <div className="form-header">
                                     <h2>User Database</h2>
-                                    <input type="text" className="search-input" placeholder="Search..." onChange={(e) => setSearchTerm(e.target.value)} />
+                                    <input 
+                                        type="text" 
+                                        className="search-input" 
+                                        placeholder="Search by name..." 
+                                        onChange={(e) => setSearchTerm(e.target.value)} 
+                                    />
                                 </div>
                                 <div className="table-responsive">
                                     <table className="professional-table">
                                         <thead>
-                                            <tr><th>Customer</th><th>Role</th><th>A/C</th><th>Action</th></tr>
+                                            <tr>
+                                                <th>Cust Name</th>
+                                                <th>Account No</th>
+                                                <th className="text-right">Action</th>
+                                            </tr>
                                         </thead>
                                         <tbody>
-                                            {filteredUsers.map(u => (
+                                            {users.filter(u => (u.firstName + " " + u.lastName).toLowerCase().includes(searchTerm.toLowerCase())).map(u => (
                                                 <tr key={u.accountNumber}>
-                                                    <td>{u.firstName} {u.lastName}</td>
-                                                    <td>{u.role}</td>
-                                                    <td>{u.accountNumber}</td>
-                                                    <td>
-                                                        <button className="view-btn-small" onClick={() => setSelectedEmail(u.email)}>Review</button>
-                                                        <button className="remove-btn-small" onClick={() => handleDeleteUser(u.accountNumber)}>Delete</button>
+                                                    <td className="user-name">{u.firstName} {u.lastName}</td>
+                                                    <td><code className="acc-number">{u.accountNumber}</code></td>
+                                                    <td className="text-right">
+                                                        <div className="admin-actions">
+                                                            <button className="view-btn-small" onClick={() => setSelectedEmail(u.email)}>Review</button>
+                                                            <button className="remove-btn-small" onClick={() => handleDeleteUser(u.accountNumber)}>Remove</button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))}

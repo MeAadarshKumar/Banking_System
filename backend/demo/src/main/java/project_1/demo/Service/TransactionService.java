@@ -1,30 +1,33 @@
 package project_1.demo.Service;
 
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project_1.demo.Model.TransactionModel;
 import project_1.demo.Model.UserModel;
 import project_1.demo.Repository.TransactionRepository;
 import project_1.demo.Repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class TransactionService {
-    @Autowired
-    private UserRepository userRepository;
+    @Autowired private UserRepository userRepository;
     @Autowired private TransactionRepository transactionRepository;
 
     @Transactional
     public String transferMoney(String senderAcc, String receiverAcc, Double amount) {
+        if (senderAcc.equals(receiverAcc)) throw new RuntimeException("Cannot transfer to yourself");
+
         UserModel sender = userRepository.findById(senderAcc)
-                .orElseThrow(() -> new RuntimeException("Sender not found"));
+                .orElseThrow(() -> new RuntimeException("Sender account not found"));
         UserModel receiver = userRepository.findById(receiverAcc)
-                .orElseThrow(() -> new RuntimeException("Receiver not found"));
+                .orElseThrow(() -> new RuntimeException("Receiver account not found"));
 
         if (sender.getBalance() < amount) throw new RuntimeException("Insufficient funds");
 
+        // Deduct and Add
         sender.setBalance(sender.getBalance() - amount);
         receiver.setBalance(receiver.getBalance() + amount);
 
@@ -38,37 +41,9 @@ public class TransactionService {
         tx.setAmount(amount);
         tx.setType("TRANSFER");
         tx.setStatus("APPROVED");
+        tx.setTimestamp(LocalDateTime.now()); // Good practice to track time
         transactionRepository.save(tx);
 
         return "Transfer Successful";
-    }
-
-    public void requestDeposit(String accNo, Double amount) {
-        TransactionModel deposit = new TransactionModel();
-        deposit.setReceiverAccountNumber(accNo);
-        deposit.setAmount(amount);
-        deposit.setType("DEPOSIT");
-        deposit.setStatus("PENDING");
-        transactionRepository.save(deposit);
-    }
-
-    @Transactional
-    public void approveDeposit(Long transactionId) {
-        TransactionModel tx = transactionRepository.findById(transactionId)
-                .orElseThrow(() -> new RuntimeException("Transaction not found"));
-
-        UserModel user = userRepository.findById(tx.getReceiverAccountNumber())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        user.setBalance(user.getBalance() + tx.getAmount());
-        tx.setStatus("APPROVED");
-
-        userRepository.save(user);
-        transactionRepository.save(tx);
-    }
-
-    @Transactional
-    public List<TransactionModel> findPending() {
-        return transactionRepository.findByStatus("PENDING");
     }
 }

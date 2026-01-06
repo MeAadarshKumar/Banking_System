@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project_1.demo.Model.UserModel;
 import project_1.demo.Service.AdminService;
+import project_1.demo.Service.DepositService;
 import project_1.demo.Service.TransactionService;
 import java.util.Map;
 
@@ -18,6 +19,9 @@ public class UserController {
 
     @Autowired
     private AdminService adminService;
+
+    @Autowired
+    private DepositService depositService;
 
     // Shared endpoint: Accessible by both USER and ADMIN roles
     @GetMapping("/details/{email}")
@@ -45,8 +49,8 @@ public class UserController {
     }
 
     @PostMapping("/deposit-request")
-    public ResponseEntity<?> deposit(@RequestParam String accNo, @RequestParam Double amount) {
-        bankingService.requestDeposit(accNo, amount);
-        return ResponseEntity.ok("Deposit request sent for admin approval");
+    public ResponseEntity<?> deposit(@RequestParam String accNo, @RequestParam Double amount, @RequestParam String email) {
+        depositService.createDepositRequest(accNo, amount, email);
+        return ResponseEntity.ok("Deposit request submitted successfully.");
     }
 }
