@@ -33,6 +33,7 @@ const UserProfileView = ({ userEmail, onBack }) => {
             head: [['Field', 'Information']],
             body: [
                 ["Account Number", userData.accountNumber],
+                ["Current Balance", `₹${userData.balance?.toLocaleString() || "0.00"}`],
                 ["Full Name", `${userData.firstName} ${userData.lastName}`],
                 ["Email", userData.email],
                 ["Phone", userData.phoneNumber],
@@ -66,6 +67,24 @@ const UserProfileView = ({ userEmail, onBack }) => {
             </div>
 
             <div className="view-grid-container" style={{padding: '20px'}}>
+                
+                {/* --- SEPARATE FINANCIAL SUMMARY SECTION --- */}
+                <div className="view-section full-width" style={{borderTop: '4px solid #089156', background: '#f0fff4'}}>
+                    <h3>Financial Summary</h3>
+                    <div className="info-grid">
+                        <div className="info-item">
+                            <span>Account Status</span>
+                            <p style={{color: '#089156'}}>ACTIVE</p>
+                        </div>
+                        <div className="info-item">
+                            <span>Available Balance</span>
+                            <p style={{fontSize: '24px', color: '#1a1a2e', fontWeight: '700'}}>
+                                ₹{userData?.balance?.toLocaleString() || "0.00"}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Section 1: Personal */}
                 <div className="view-section">
                     <h3>Personal Details</h3>
@@ -82,7 +101,7 @@ const UserProfileView = ({ userEmail, onBack }) => {
                     <div className="info-grid">
                         <div className="info-item"><span>PAN Number</span><p style={{textTransform: 'uppercase'}}>{userData?.panNumber}</p></div>
                         <div className="info-item"><span>Aadhar Number</span><p>{userData?.aadharNumber}</p></div>
-                        <div className="info-item"><span>Status</span><p style={{color: 'green', fontWeight: 'bold'}}>VERIFIED</p></div>
+                        <div className="info-item"><span>KYC Status</span><p style={{color: 'green', fontWeight: 'bold'}}>VERIFIED</p></div>
                     </div>
                 </div>
 
@@ -96,12 +115,19 @@ const UserProfileView = ({ userEmail, onBack }) => {
                 </div>
 
                 {/* Section 4: Contact */}
-                <div className="view-section full-width">
-                    <h3>Contact & Communication</h3>
-                    <div className="info-grid three-col">
-                        <div className="info-item"><span>Email ID</span><p>{userData?.email}</p></div>
+                <div className="view-section">
+                    <h3>Contact Details</h3>
+                    <div className="info-grid">
                         <div className="info-item"><span>Phone Number</span><p>{userData?.phoneNumber}</p></div>
-                        <div className="info-item"><span>Residential Address</span><p>{userData?.address}</p></div>
+                        <div className="info-item"><span>Email ID</span><p>{userData?.email}</p></div>
+                    </div>
+                </div>
+
+                {/* Address Section */}
+                <div className="view-section full-width">
+                    <h3>Residential Address</h3>
+                    <div className="info-item">
+                        <p>{userData?.address}</p>
                     </div>
                 </div>
             </div>
