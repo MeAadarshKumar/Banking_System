@@ -3,10 +3,13 @@ package project_1.demo.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import project_1.demo.Model.TransactionModel;
 import project_1.demo.Model.UserModel;
 import project_1.demo.Service.AdminService;
 import project_1.demo.Service.DepositService;
 import project_1.demo.Service.TransactionService;
+
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -15,7 +18,7 @@ import java.util.Map;
 public class UserController {
 
     @Autowired
-    private TransactionService bankingService;
+    private TransactionService transactionService;
 
     @Autowired
     private AdminService adminService;
@@ -41,7 +44,7 @@ public class UserController {
     @PostMapping("/transfer")
     public ResponseEntity<?> transfer(@RequestParam String from, @RequestParam String to, @RequestParam Double amount) {
         try {
-            String result = bankingService.transferMoney(from, to, amount);
+            String result = transactionService.transferMoney(from, to, amount);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -52,5 +55,10 @@ public class UserController {
     public ResponseEntity<?> deposit(@RequestParam String accNo, @RequestParam Double amount, @RequestParam String email) {
         depositService.createDepositRequest(accNo, amount, email);
         return ResponseEntity.ok("Deposit request submitted successfully.");
+    }
+
+    @GetMapping("/transactions/{accNo}")
+    public List<TransactionModel> getMyTransactions(@PathVariable String accNo) {
+        return transactionService.getUserTransactionHistory(accNo);
     }
 }

@@ -20,7 +20,8 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
-
+    @Autowired
+    private TransactionService transactionService;
 
     @Autowired
     private DepositService depositService;
@@ -55,4 +56,12 @@ public class AdminController {
         depositService.rejectDepositRequest(id);
         return ResponseEntity.ok(Map.of("message", "Deposit Rejected."));
     }
+
+    // Inside AdminController.java
+    @GetMapping("/all-transactions")
+    public List<TransactionModel> getAllTransactions() {
+        return transactionService.getAllTransactions();
+    }
+
+
 }

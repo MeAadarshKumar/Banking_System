@@ -46,4 +46,13 @@ public class TransactionService {
 
         return "Transfer Successful";
     }
+
+    // Inside TransactionService.java
+    public List<TransactionModel> getAllTransactions() {
+        return transactionRepository.findAllByOrderByTimestampDesc();
+    }
+
+    public List<TransactionModel> getUserTransactionHistory(String accNo) {
+        return transactionRepository.findBySenderAccountNumberOrReceiverAccountNumberOrderByTimestampDesc(accNo, accNo);
+    }
 }

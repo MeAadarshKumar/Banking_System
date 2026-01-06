@@ -9,4 +9,9 @@ import java.util.List;
 @Repository
 public interface TransactionRepository extends JpaRepository<TransactionModel, Long> {
     List<TransactionModel> findByStatus(String status); // For Admin verification
+    List<TransactionModel> findAllByOrderByTimestampDesc();
+
+    List<TransactionModel> findBySenderAccountNumberOrReceiverAccountNumberOrderByTimestampDesc(
+            String sender, String receiver
+    );
 }

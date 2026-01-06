@@ -3,18 +3,31 @@ import axios from 'axios';
 import UserProfileView from './UserProfileView';
 import DepositApprovalView from './DepositApproval';
 import '../styles/Dashboard.css';
-
+import AdminTransaction  from './AdminTransaction';
 const AdminDashboard = ({ onLogout, user }) => { 
     const [users, setUsers] = useState([]);
     const [pendingDeposits, setPendingDeposits] = useState([]);
     const [view, setView] = useState('stats');
     const [selectedEmail, setSelectedEmail] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
+    const [allTransactions, setAllTransactions] = React.useState([]);
+
 
     useEffect(() => {
         if (view === 'userList') fetchUsers();
         if (view === 'deposits' || view === 'stats') fetchPending();
+        if (view === 'transfers') fetchAllTransactions();
     }, [view]);
+
+
+    const fetchAllTransactions = async () => {
+    try {
+        const res = await axios.get("http://localhost:8080/api/admin/all-transactions");
+        setAllTransactions(res.data);
+    } catch (error) { console.error("Error fetching transactions", error); }
+    };
+
+
 
     const fetchUsers = async () => {
         try {
@@ -61,9 +74,39 @@ const AdminDashboard = ({ onLogout, user }) => {
             <nav className="navbar">
                 <div className="nav-brand">🏦 ADMIN PANEL</div>
                 <ul className="nav-links">
-                    <li><button className={`nav-link-btn ${view === 'stats' ? 'active' : ''}`} onClick={() => setView('stats')}>Analytics</button></li>
-                    <li><button className={`nav-link-btn ${view === 'deposits' ? 'active' : ''}`} onClick={() => setView('deposits')}>Deposits</button></li>
-                    <li><button className={`nav-link-btn ${view === 'userList' ? 'active' : ''}`} onClick={() => setView('userList')}>Users</button></li>
+                    {/* Each button now resets selectedEmail to null so the view can change */}
+                    <li>
+                        <button 
+                            className={`nav-link-btn ${view === 'stats' ? 'active' : ''}`} 
+                            onClick={() => { setView('stats'); setSelectedEmail(null); }}
+                        >
+                            Analytics
+                        </button>
+                    </li>
+                    <li>
+                        <button 
+                            className={`nav-link-btn ${view === 'deposits' ? 'active' : ''}`} 
+                            onClick={() => { setView('deposits'); setSelectedEmail(null); }}
+                        >
+                            Deposits
+                        </button>
+                    </li>
+                    <li>
+                        <button 
+                            className={`nav-link-btn ${view === 'transfers' ? 'active' : ''}`} 
+                            onClick={() => { setView('transfers'); setSelectedEmail(null); }}
+                        >
+                            Transfers
+                        </button>
+                    </li>
+                    <li>
+                        <button 
+                            className={`nav-link-btn ${view === 'userList' ? 'active' : ''}`} 
+                            onClick={() => { setView('userList'); setSelectedEmail(null); }}
+                        >
+                            Users
+                        </button>
+                    </li>
                     <li><button className="logout-btn" onClick={onLogout}>Logout</button></li>
                 </ul>
             </nav>
@@ -75,6 +118,10 @@ const AdminDashboard = ({ onLogout, user }) => {
                     <>
                         {view === 'deposits' && (
                             <DepositApprovalView requests={pendingDeposits} onAction={handleAction} />
+                        )}
+
+                        {view === 'transfers' && (
+                            <AdminTransaction transactions={allTransactions} />
                         )}
 
                         {view === 'userList' && (

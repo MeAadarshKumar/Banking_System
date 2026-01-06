@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import TransferMoney from './TransferMoney';
 import UserProfileView from './UserProfileView';
-import '../styles/Dashboard.css';
 import DepositForm from './DepositForm';
+// IMPORT the new history component
+import UserTransactionHistory from './UserTransactionHistory'; 
+import '../styles/Dashboard.css';
 
 const UserDashboard = ({ onLogout, user }) => {
+    // Consolidated state to manage all views
     const [activeTab, setActiveTab] = useState('home');
 
-    // Prevent rendering if user is missing
     if (!user) return <div className="dashboard-wrapper">Initializing session...</div>;
 
     return (
@@ -31,14 +33,22 @@ const UserDashboard = ({ onLogout, user }) => {
                             Deposit
                         </button>
                     </li>
-                    <li>
-                        <button 
-                            className={`nav-link-btn ${activeTab === 'transfer' ? 'active' : ''}`} 
-                            onClick={() => setActiveTab('transfer')}
-                        >
-                            Transfer
+
+                    {/* UPDATED DROPDOWN: Uses activeTab instead of undefined view/setView */}
+                    <li className="dropdown">
+                        <button className={`nav-link-btn ${activeTab === 'transfer' || activeTab === 'history' ? 'active' : ''}`}>
+                            Transfer ▾
                         </button>
+                        <div className="dropdown-content">
+                            <button className="dropdown-item" onClick={() => setActiveTab('transfer')}>
+                                Send Money
+                            </button>
+                            <button className="dropdown-item" onClick={() => setActiveTab('history')}>
+                                Transaction History
+                            </button>
+                        </div>
                     </li>
+
                     <li>
                         <button 
                             className={`nav-link-btn ${activeTab === 'profile' ? 'active' : ''}`} 
@@ -77,9 +87,14 @@ const UserDashboard = ({ onLogout, user }) => {
                     <DepositForm user={user} onBack={() => setActiveTab('home')} />
                 )}
 
-                {/* --- TRANSFER VIEW --- */}
+                {/* --- TRANSFER VIEW (Send Money) --- */}
                 {activeTab === 'transfer' && (
                     <TransferMoney senderAcc={user.accountNumber} />
+                )}
+
+                {/* --- TRANSACTION HISTORY VIEW --- */}
+                {activeTab === 'history' && (
+                    <UserTransactionHistory userAccount={user.accountNumber} />
                 )}
 
                 {/* --- PROFILE VIEW --- */}
