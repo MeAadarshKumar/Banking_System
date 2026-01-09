@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import TransferMoney from './TransferMoney';
 import UserProfileView from './UserProfileView';
 import DepositForm from './DepositForm';
-// IMPORT the new history component
 import UserTransactionHistory from './UserTransactionHistory'; 
+import UserLoanRequest from './UserLoanRequest'; // Import the new component
 import '../styles/Dashboard.css';
+import UserLoanHistory from './UserLoanHistory'; // Ensure this import exists
+
 
 const UserDashboard = ({ onLogout, user }) => {
-    // Consolidated state to manage all views
     const [activeTab, setActiveTab] = useState('home');
 
     if (!user) return <div className="dashboard-wrapper">Initializing session...</div>;
@@ -21,31 +22,32 @@ const UserDashboard = ({ onLogout, user }) => {
                         <button 
                             className={`nav-link-btn ${activeTab === 'home' ? 'active' : ''}`} 
                             onClick={() => setActiveTab('home')}
-                        >
-                            Home
-                        </button>
+                        >Home</button>
                     </li>
                     <li>
                         <button 
                             className={`nav-link-btn ${activeTab === 'deposit' ? 'active' : ''}`} 
                             onClick={() => setActiveTab('deposit')}
-                        >
-                            Deposit
-                        </button>
+                        >Deposit</button>
                     </li>
 
-                    {/* UPDATED DROPDOWN: Uses activeTab instead of undefined view/setView */}
                     <li className="dropdown">
                         <button className={`nav-link-btn ${activeTab === 'transfer' || activeTab === 'history' ? 'active' : ''}`}>
                             Transfer ▾
                         </button>
                         <div className="dropdown-content">
-                            <button className="dropdown-item" onClick={() => setActiveTab('transfer')}>
-                                Send Money
-                            </button>
-                            <button className="dropdown-item" onClick={() => setActiveTab('history')}>
-                                Transaction History
-                            </button>
+                            <button className="dropdown-item" onClick={() => setActiveTab('transfer')}>Send Money</button>
+                            <button className="dropdown-item" onClick={() => setActiveTab('history')}>Transaction History</button>
+                        </div>
+                    </li>
+
+                   <li className="dropdown">
+                        <button className={`nav-link-btn ${activeTab === 'applyLoan' || activeTab === 'loanHistory' ? 'active' : ''}`}>
+                            Loan ▾
+                        </button>
+                        <div className="dropdown-content">
+                            <button className="dropdown-item" onClick={() => setActiveTab('applyLoan')}>Apply Loan</button>
+                            <button className="dropdown-item" onClick={() => setActiveTab('loanHistory')}>Loan History</button>
                         </div>
                     </li>
 
@@ -53,16 +55,13 @@ const UserDashboard = ({ onLogout, user }) => {
                         <button 
                             className={`nav-link-btn ${activeTab === 'profile' ? 'active' : ''}`} 
                             onClick={() => setActiveTab('profile')}
-                        >
-                            Profile
-                        </button>
+                        >Profile</button>
                     </li>
                     <li><button className="logout-btn" onClick={onLogout}>Logout</button></li>
                 </ul>
             </nav>
 
             <main className="dashboard-content">
-                {/* --- HOME VIEW --- */}
                 {activeTab === 'home' && (
                     <div className="form-card-container">
                         <div className="form-header">
@@ -82,27 +81,27 @@ const UserDashboard = ({ onLogout, user }) => {
                     </div>
                 )}
 
-                {/* --- DEPOSIT VIEW --- */}
-                {activeTab === 'deposit' && (
-                    <DepositForm user={user} onBack={() => setActiveTab('home')} />
+                {activeTab === 'deposit' && <DepositForm user={user} onBack={() => setActiveTab('home')} />}
+                {activeTab === 'transfer' && <TransferMoney senderAcc={user.accountNumber} />}
+                {activeTab === 'history' && <UserTransactionHistory userAccount={user.accountNumber} />}
+                
+            {/* FIXED: Changed 'loan' to 'applyLoan' to match the nav button */}
+                {activeTab === 'applyLoan' && (
+                    <div className="form-card-container">
+                        {/* Pass the full user object to satisfy the child component's needs */}
+                        <UserLoanRequest user={user} /> 
+                    </div>
                 )}
 
-                {/* --- TRANSFER VIEW (Send Money) --- */}
-                {activeTab === 'transfer' && (
-                    <TransferMoney senderAcc={user.accountNumber} />
+                {/* ADDED: Logic for loanHistory if you have a component for it */}
+                {activeTab === 'loanHistory' && (
+                    <div className="form-card-container">
+                        <UserLoanHistory userAccount={user.accountNumber} />
+                    </div>
                 )}
 
-                {/* --- TRANSACTION HISTORY VIEW --- */}
-                {activeTab === 'history' && (
-                    <UserTransactionHistory userAccount={user.accountNumber} />
-                )}
-
-                {/* --- PROFILE VIEW --- */}
                 {activeTab === 'profile' && (
-                    <UserProfileView 
-                        userEmail={user.email} 
-                        onBack={() => setActiveTab('home')} 
-                    />
+                    <UserProfileView userEmail={user.email} onBack={() => setActiveTab('home')} />
                 )}
             </main>
         </div>

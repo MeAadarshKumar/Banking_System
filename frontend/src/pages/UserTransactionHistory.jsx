@@ -7,7 +7,7 @@ const UserTransactionHistory = ({ userAccount }) => {
     useEffect(() => {
         const fetchHistory = async () => {
             try {
-                const res = await axios.get(`http://localhost:8080/api/user/transactions/${userAccount}`);
+                const res = await axios.get(`http://localhost:8080/api/transactions/history/${userAccount}`);
                 setTransactions(res.data);
             } catch (err) {
                 console.error("Failed to fetch history");

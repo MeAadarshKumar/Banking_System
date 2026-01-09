@@ -3,34 +3,22 @@ package project_1.demo.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import project_1.demo.Model.TransactionModel;
 import project_1.demo.Model.UserModel;
 import project_1.demo.Service.AdminService;
-import project_1.demo.Service.DepositService;
-import project_1.demo.Service.TransactionService;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
-@CrossOrigin(origins = "http://localhost:3000") // Fixes the browser-side connection block
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
-
-    @Autowired
-    private TransactionService transactionService;
 
     @Autowired
     private AdminService adminService;
 
-    @Autowired
-    private DepositService depositService;
-
-    // Shared endpoint: Accessible by both USER and ADMIN roles
     @GetMapping("/details/{email}")
     public ResponseEntity<?> getUserDetails(@PathVariable String email) {
         try {
-            // This service method must find the user by their email string
             UserModel user = adminService.getUserByEmail(email);
             if (user == null) {
                 return ResponseEntity.status(404).body(Map.of("error", "User not found"));
@@ -39,26 +27,5 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
-    }
-
-    @PostMapping("/transfer")
-    public ResponseEntity<?> transfer(@RequestParam String from, @RequestParam String to, @RequestParam Double amount) {
-        try {
-            String result = transactionService.transferMoney(from, to, amount);
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @PostMapping("/deposit-request")
-    public ResponseEntity<?> deposit(@RequestParam String accNo, @RequestParam Double amount, @RequestParam String email) {
-        depositService.createDepositRequest(accNo, amount, email);
-        return ResponseEntity.ok("Deposit request submitted successfully.");
-    }
-
-    @GetMapping("/transactions/{accNo}")
-    public List<TransactionModel> getMyTransactions(@PathVariable String accNo) {
-        return transactionService.getUserTransactionHistory(accNo);
     }
 }

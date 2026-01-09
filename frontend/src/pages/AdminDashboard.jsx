@@ -3,7 +3,10 @@ import axios from 'axios';
 import UserProfileView from './UserProfileView';
 import DepositApprovalView from './DepositApproval';
 import '../styles/Dashboard.css';
+import AdminLoanView from './AdminLoanView';
 import AdminTransaction  from './AdminTransaction';
+import AdminCreateLoanModel from './AdminCreateLoanModel';
+
 const AdminDashboard = ({ onLogout, user }) => { 
     const [users, setUsers] = useState([]);
     const [pendingDeposits, setPendingDeposits] = useState([]);
@@ -99,6 +102,15 @@ const AdminDashboard = ({ onLogout, user }) => {
                             Transfers
                         </button>
                     </li>
+                    <li className="dropdown">
+                        <button className="nav-link-btn">Loans ▾</button>
+                        <div className="dropdown-content">
+                            <button className="dropdown-item" onClick={() => setView('createLoanModel')}>Create Loan Model</button>
+                            {/* Same Nav Name, points to the new consolidated table */}
+                            <button className="dropdown-item" onClick={() => setView('manageLoans')}>Manage Loan Requests</button>
+                        </div>
+                    </li>
+
                     <li>
                         <button 
                             className={`nav-link-btn ${view === 'userList' ? 'active' : ''}`} 
@@ -116,13 +128,15 @@ const AdminDashboard = ({ onLogout, user }) => {
                     <UserProfileView userEmail={selectedEmail} onBack={() => setSelectedEmail(null)} />
                 ) : (
                     <>
-                        {view === 'deposits' && (
-                            <DepositApprovalView requests={pendingDeposits} onAction={handleAction} />
+                        {view === 'deposits' && (<DepositApprovalView requests={pendingDeposits} onAction={handleAction} />
                         )}
 
-                        {view === 'transfers' && (
-                            <AdminTransaction transactions={allTransactions} />
+                        {view === 'transfers' && ( <AdminTransaction transactions={allTransactions} />
                         )}
+                        
+                        {view === 'createLoanModel' && <AdminCreateLoanModel />}
+            
+                        {view === 'manageLoans' && <AdminLoanView />}
 
                         {view === 'userList' && (
                             <div className="form-card-container">

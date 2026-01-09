@@ -16,7 +16,7 @@ const DepositForm = ({ user, onBack }) => {
     setLoading(true);
     try {
         // Use standard params object for @RequestParam compatibility
-        await axios.post(`http://localhost:8080/api/user/deposit-request`, null, {
+        await axios.post(`http://localhost:8080/api/transactions/deposit-request`, null, {
             params: {
                 accNo: user.accountNumber,
                 amount: depositAmount,

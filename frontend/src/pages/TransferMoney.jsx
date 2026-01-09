@@ -18,7 +18,7 @@ const TransferMoney = ({ senderAcc }) => {
         try {
             // Using the @RequestParam mapping we defined in the Backend Step 4
             const response = await axios.post(
-                `http://localhost:8080/api/user/transfer?from=${senderAcc}&to=${transferData.to}&amount=${transferData.amount}`
+                `http://localhost:8080/api/transactions/transfer?from=${senderAcc}&to=${transferData.to}&amount=${transferData.amount}`
             );
             alert("Transfer Successful: " + response.data);
             setTransferData({ to: "", amount: "" });
