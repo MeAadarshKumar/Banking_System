@@ -1,80 +1,83 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const AdminLoanView = () => {
     const [loans, setLoans] = useState([]);
+    const [selectedLoan, setSelectedLoan] = useState(null);
 
-    useEffect(() => { fetchLoans(); }, []);
-
-    const fetchLoans = async () => {
+    const fetchLoans = useCallback(async () => {
         try {
-            // Fetch all loans and filter out the "TEMPLATE" records on the frontend
             const res = await axios.get("http://localhost:8080/api/loans/admin/all");
-            const userRequests = res.data.filter(l => l.accountNumber !== "TEMPLATE");
-            setLoans(userRequests);
-        } catch (err) { 
-            console.error("Error fetching loans", err); 
+            // BUG FIX: Filter out the TEMPLATE row (accountNumber is "TEMPLATE" or null)
+            const filtered = res.data.filter(loan => 
+                loan.accountNumber && loan.accountNumber !== "TEMPLATE"
+            );
+            setLoans(filtered);
+        } catch (error) {
+            console.error("Error fetching loans:", error);
         }
-    };
+    }, []);
 
-    const handleAction = async (id, status) => {
-        try {
-            await axios.post(`http://localhost:8080/api/loans/admin/status/${id}/${status}`);
-            alert(`Loan application ${status.toLowerCase()} successfully!`);
-            fetchLoans(); // Refresh the table
-        } catch (err) { 
-            alert(err.response?.data || "Operation failed"); 
-        }
-    };
+    useEffect(() => {
+        fetchLoans();
+        // AUTO-REFRESH: Sync data when switching back to this tab
+        window.addEventListener('focus', fetchLoans);
+        return () => window.removeEventListener('focus', fetchLoans);
+    }, [fetchLoans]);
 
     return (
-        <div className="form-card-container">
-            <div className="form-header">
-                <h2>Loan Request Management</h2>
-                <p>Review and process pending customer loan applications</p>
-            </div>
-            
-            <div className="table-responsive">
-                <table className="professional-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Account Number</th>
-                            <th>Principal</th>
-                            <th>Duration</th>
-                            <th>Status</th>
-                            <th className="text-right">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loans.length > 0 ? loans.map(l => (
-                            <tr key={l.loanId}>
-                                <td>#LN-{l.loanId}</td>
-                                <td><code className="acc-number">{l.accountNumber}</code></td>
-                                <td>₹{l.principal.toLocaleString()}</td>
-                                <td>{l.durationMonths} Months</td>
-                                <td>
-                                    <span className={`status-badge ${l.status.toLowerCase()}`}>
-                                        {l.status}
-                                    </span>
-                                </td>
-                                <td className="text-right">
-                                    {l.status === 'PENDING' ? (
-                                        <div className="admin-actions">
-                                            <button className="approve-btn-small" onClick={() => handleAction(l.loanId, 'APPROVED')}>Approve</button>
-                                            <button className="reject-btn-small" onClick={() => handleAction(l.loanId, 'REJECTED')}>Decline</button>
-                                        </div>
-                                    ) : (
-                                        <span className="processed-label">Processed</span>
-                                    )}
-                                </td>
+        <div className="dashboard-content">
+            <div className="form-card-container">
+                <div className="form-header">
+                    <h2>Manage Loan Requests</h2>
+                    <p>Review and process incoming customer loan applications</p>
+                </div>
+                
+                <div className="table-responsive">
+                    <table className="professional-table">
+                        <thead>
+                            <tr>
+                                <th>Acc No</th>
+                                <th>Principal</th>
+                                <th>Status</th>
+                                <th className="text-right">Action</th>
                             </tr>
-                        )) : (
-                            <tr><td colSpan="6" style={{textAlign: 'center', padding: '20px'}}>No user loan applications found.</td></tr>
-                        )}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {loans.map(loan => (
+                                <tr key={loan.id}>
+                                    <td><span className="acc-number">{loan.accountNumber}</span></td>
+                                    <td><strong>₹{loan.principal.toLocaleString()}</strong></td>
+                                    <td><span className={`badge ${loan.status.toLowerCase()}`}>{loan.status}</span></td>
+                                    <td className="text-right">
+                                        <button className="view-btn-small" onClick={() => setSelectedLoan(loan)}>
+                                            View Details
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
+            {/* Detailed Modal View */}
+            {selectedLoan && (
+                <div className="loan-detail-overlay" onClick={() => setSelectedLoan(null)}>
+                    <div className="loan-detail-card" onClick={e => e.stopPropagation()}>
+                        <h3>Loan Profile: {selectedLoan.accountNumber}</h3>
+                        <div className="detail-grid">
+                            <p><span>Status</span> <b className={`badge ${selectedLoan.status.toLowerCase()}`}>{selectedLoan.status}</b></p>
+                            <p><span>Total Principal</span> <b>₹{selectedLoan.principal}</b></p>
+                            <p><span>Interest Rate</span> <b>{selectedLoan.interestRate}%</b></p>
+                            <p><span>EMI Amount</span> <b className="emi-text">₹{selectedLoan.emiAmount?.toFixed(2)}</b></p>
+                        </div>
+                        <button className="logout-btn" style={{width: '100%', marginTop: '20px'}} onClick={() => setSelectedLoan(null)}>
+                            Close Preview
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

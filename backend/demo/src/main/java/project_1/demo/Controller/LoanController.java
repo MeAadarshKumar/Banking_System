@@ -1,5 +1,6 @@
 package project_1.demo.Controller;
 
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -70,4 +71,26 @@ public class LoanController {
             return ResponseEntity.status(404).body(e.getMessage());
         }
     }
+
+    @PostMapping("/pay")
+    public ResponseEntity<?> payLoan(@RequestBody PaymentRequest request) {
+        try {
+            loanService.processPayment(
+                    request.getLoanId(),
+                    request.getAmount(),
+                    request.isDirectPrincipal()
+            );
+            return ResponseEntity.ok("Payment processed successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    // Simple DTO class to handle the incoming JSON
+    @Data
+    public static class PaymentRequest {
+        private Long loanId;
+        private Double amount;
+        private boolean isDirectPrincipal;
+    }
+
 }

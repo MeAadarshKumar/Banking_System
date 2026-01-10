@@ -25,5 +25,10 @@ public class LoanModel {
     private LoanStatus status; // PENDING, APPROVED, REJECTED, PAID
 
     private LocalDateTime appliedDate;
+
+    // Add this field to your LoanModel class
+    private Double remainingPrincipal;
+    private Double emiAmount; // To store the calculated monthly payment
+    private Double totalPaid;
 }
 

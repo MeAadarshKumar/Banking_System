@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import UserProfileView from './UserProfileView';
 import DepositApprovalView from './DepositApproval';
-import '../styles/Dashboard.css';
 import AdminLoanView from './AdminLoanView';
-import AdminTransaction  from './AdminTransaction';
+import AdminTransaction from './AdminTransaction';
 import AdminCreateLoanModel from './AdminCreateLoanModel';
+import '../styles/Dashboard.css';
 
 const AdminDashboard = ({ onLogout, user }) => { 
     const [users, setUsers] = useState([]);
@@ -15,22 +15,18 @@ const AdminDashboard = ({ onLogout, user }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [allTransactions, setAllTransactions] = React.useState([]);
 
-
     useEffect(() => {
         if (view === 'userList') fetchUsers();
         if (view === 'deposits' || view === 'stats') fetchPending();
         if (view === 'transfers') fetchAllTransactions();
     }, [view]);
 
-
     const fetchAllTransactions = async () => {
-    try {
-        const res = await axios.get("http://localhost:8080/api/admin/all-transactions");
-        setAllTransactions(res.data);
-    } catch (error) { console.error("Error fetching transactions", error); }
+        try {
+            const res = await axios.get("http://localhost:8080/api/admin/all-transactions");
+            setAllTransactions(res.data);
+        } catch (error) { console.error("Error fetching transactions", error); }
     };
-
-
 
     const fetchUsers = async () => {
         try {
@@ -51,14 +47,12 @@ const AdminDashboard = ({ onLogout, user }) => {
             const url = action === 'approve' 
                 ? `http://localhost:8080/api/admin/approve-deposit/${id}`
                 : `http://localhost:8080/api/admin/reject-deposit/${id}`;
-            
             await axios.post(url);
             alert(`Deposit ${action === 'approve' ? 'Approved' : 'Rejected'}!`);
             fetchPending();
         } catch (error) { 
-            // Better error logging to identify 500 errors
             console.error("Action Error:", error.response?.data);
-            alert(`${action} failed: Internal Server Error (Check Backend Logs)`); 
+            alert(`${action} failed: Internal Server Error`); 
         }
     };
 
@@ -77,48 +71,17 @@ const AdminDashboard = ({ onLogout, user }) => {
             <nav className="navbar">
                 <div className="nav-brand">🏦 ADMIN PANEL</div>
                 <ul className="nav-links">
-                    {/* Each button now resets selectedEmail to null so the view can change */}
-                    <li>
-                        <button 
-                            className={`nav-link-btn ${view === 'stats' ? 'active' : ''}`} 
-                            onClick={() => { setView('stats'); setSelectedEmail(null); }}
-                        >
-                            Analytics
-                        </button>
-                    </li>
-                    <li>
-                        <button 
-                            className={`nav-link-btn ${view === 'deposits' ? 'active' : ''}`} 
-                            onClick={() => { setView('deposits'); setSelectedEmail(null); }}
-                        >
-                            Deposits
-                        </button>
-                    </li>
-                    <li>
-                        <button 
-                            className={`nav-link-btn ${view === 'transfers' ? 'active' : ''}`} 
-                            onClick={() => { setView('transfers'); setSelectedEmail(null); }}
-                        >
-                            Transfers
-                        </button>
-                    </li>
+                    <li><button className={`nav-link-btn ${view === 'stats' ? 'active' : ''}`} onClick={() => { setView('stats'); setSelectedEmail(null); }}>Analytics</button></li>
+                    <li><button className={`nav-link-btn ${view === 'deposits' ? 'active' : ''}`} onClick={() => { setView('deposits'); setSelectedEmail(null); }}>Deposits</button></li>
+                    <li><button className={`nav-link-btn ${view === 'transfers' ? 'active' : ''}`} onClick={() => { setView('transfers'); setSelectedEmail(null); }}>Transfers</button></li>
                     <li className="dropdown">
                         <button className="nav-link-btn">Loans ▾</button>
                         <div className="dropdown-content">
                             <button className="dropdown-item" onClick={() => setView('createLoanModel')}>Create Loan Model</button>
-                            {/* Same Nav Name, points to the new consolidated table */}
                             <button className="dropdown-item" onClick={() => setView('manageLoans')}>Manage Loan Requests</button>
                         </div>
                     </li>
-
-                    <li>
-                        <button 
-                            className={`nav-link-btn ${view === 'userList' ? 'active' : ''}`} 
-                            onClick={() => { setView('userList'); setSelectedEmail(null); }}
-                        >
-                            Users
-                        </button>
-                    </li>
+                    <li><button className={`nav-link-btn ${view === 'userList' ? 'active' : ''}`} onClick={() => { setView('userList'); setSelectedEmail(null); }}>Users</button></li>
                     <li><button className="logout-btn" onClick={onLogout}>Logout</button></li>
                 </ul>
             </nav>
@@ -128,26 +91,22 @@ const AdminDashboard = ({ onLogout, user }) => {
                     <UserProfileView userEmail={selectedEmail} onBack={() => setSelectedEmail(null)} />
                 ) : (
                     <>
-                        {view === 'deposits' && (<DepositApprovalView requests={pendingDeposits} onAction={handleAction} />
-                        )}
-
-                        {view === 'transfers' && ( <AdminTransaction transactions={allTransactions} />
-                        )}
-                        
+                        {view === 'deposits' && <DepositApprovalView requests={pendingDeposits} onAction={handleAction} />}
+                        {view === 'transfers' && <AdminTransaction transactions={allTransactions} />}
                         {view === 'createLoanModel' && <AdminCreateLoanModel />}
-            
                         {view === 'manageLoans' && <AdminLoanView />}
-
                         {view === 'userList' && (
                             <div className="form-card-container">
-                                <div className="form-header">
+                                <div className="form-header user-db-header">
                                     <h2>User Database</h2>
-                                    <input 
-                                        type="text" 
-                                        className="search-input" 
-                                        placeholder="Search by name..." 
-                                        onChange={(e) => setSearchTerm(e.target.value)} 
-                                    />
+                                    <div className="search-wrapper">
+                                        <input 
+                                            type="text" 
+                                            className="search-input-styled" 
+                                            placeholder="Search by name..." 
+                                            onChange={(e) => setSearchTerm(e.target.value)} 
+                                        />
+                                    </div>
                                 </div>
                                 <div className="table-responsive">
                                     <table className="professional-table">

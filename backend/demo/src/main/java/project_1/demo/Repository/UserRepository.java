@@ -12,7 +12,7 @@ public interface UserRepository extends JpaRepository<UserModel, String> {
     // CHANGE THIS: Return Optional instead of UserModel
     Optional<UserModel> findByEmail(String email);
 
-    UserModel findByAccountNumber(String accountNumber);
+    Optional<UserModel> findByAccountNumber(String accountNumber);
 
     @Query("SELECT SUM(u.balance) FROM UserModel u")
     Double getTotalBalanceSum();

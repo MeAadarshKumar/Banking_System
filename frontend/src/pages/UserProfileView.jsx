@@ -14,11 +14,8 @@ const UserProfileView = ({ userEmail, onBack }) => {
             try {
                 const response = await axios.get(`http://localhost:8080/api/user/details/${userEmail}`);
                 setUserData(response.data);
-            } catch (err) {
-                console.error("Profile Fetch Error");
-            } finally {
-                setLoading(false);
-            }
+            } catch (err) { console.error("Profile Fetch Error"); }
+            finally { setLoading(false); }
         };
         fetchDetails();
     }, [userEmail]);
@@ -57,14 +54,9 @@ const UserProfileView = ({ userEmail, onBack }) => {
         <div className="form-card-container">
             <div className="profile-header-layout">
                 <div className="header-top-actions">
-                    <button className="download-pdf-btn" onClick={generatePDF}>
-                        Download PDF
-                    </button>
-                    <button className="back-btn-top" onClick={onBack}>
-                        ← Back
-                    </button>
+                    <button className="download-pdf-btn" onClick={generatePDF}>Download PDF</button>
+                    <button className="back-btn-top" onClick={onBack}>← Back</button>
                 </div>
-                
                 <div className="welcome-center-section">
                     <h1>Welcome: {userData?.firstName} {userData?.lastName}</h1>
                     <p className="centered-acc">A/C: {userData?.accountNumber}</p>
@@ -72,28 +64,21 @@ const UserProfileView = ({ userEmail, onBack }) => {
             </div>
 
             <div className="view-grid-container" style={{padding: '20px'}}>
-                
-                {/* --- FINANCIAL SUMMARY SECTION --- */}
                 <div className="view-section full-width financial-summary-card">
                     <h3>Financial Summary</h3>
                     <div className="info-grid">
                         <div className="info-item">
-                            {/* The 'span' below will be green due to CSS targeting */}
                             <span>Account Status</span>
                             <p className="status-active">ACTIVE</p>
                         </div>
                         <div className="info-item">
-                            {/* The 'span' below will be green due to CSS targeting */}
                             <span>Available Balance</span>
-                            <p className="balance-text">
-                                ₹{userData?.balance?.toLocaleString() || "0.00"}
-                            </p>
+                            <p className="balance-text">₹{userData?.balance?.toLocaleString() || "0.00"}</p>
                         </div>
                     </div>
                 </div>
 
-                {/* Section 1: Personal */}
-                <div className="view-section">
+                <div className="view-section personal-details-card">
                     <h3>Personal Details</h3>
                     <div className="info-grid">
                         <div className="info-item"><span>Full Name</span><p>{userData?.firstName} {userData?.lastName}</p></div>
@@ -102,20 +87,16 @@ const UserProfileView = ({ userEmail, onBack }) => {
                     </div>
                 </div>
 
-                {/* Section 2: Identity */}
-                <div className="view-section">
+                <div className="view-section identity-kyc-card">
                     <h3>Identity & KYC</h3>
                     <div className="info-grid">
                         <div className="info-item"><span>PAN Number</span><p style={{textTransform: 'uppercase'}}>{userData?.panNumber}</p></div>
                         <div className="info-item"><span>Aadhar Number</span><p>{userData?.aadharNumber}</p></div>
-                        <div className="info-item"><span>KYC Status</span><p style={{color: '#089156', fontWeight: '700'}}>VERIFIED</p></div>
+                        <div className="info-item"><span>KYC Status</span><p className="status-active">VERIFIED</p></div>
                     </div>
                 </div>
-
-                {/* Other sections follow standard styling... */}
             </div>
         </div>
     );
 };
-
 export default UserProfileView;
