@@ -7,7 +7,7 @@ const UserLoanHistory = ({ userAccount }) => {
     const fetchMyLoans = useCallback(async () => {
         if (!userAccount) return;
         try {
-            const res = await axios.get("http://localhost:8080/api/loans/admin/all");
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/loans/admin/all`);
             // Filter out templates (items without an accountNumber) AND match the user
             const filtered = res.data.filter(l => l.accountNumber === userAccount);
             setMyLoans(filtered);
@@ -28,7 +28,7 @@ const UserLoanHistory = ({ userAccount }) => {
 
     const handlePayment = async (loanId, amount, isPrincipal) => {
         try {
-            await axios.post(`http://localhost:8080/api/loans/pay`, {
+            await axios.post(`${process.env.REACT_APP_API_URL}/api/loans/pay`, {
                 loanId,
                 amount,
                 isDirectPrincipal: isPrincipal

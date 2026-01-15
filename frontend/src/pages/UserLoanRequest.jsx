@@ -6,7 +6,7 @@ const UserLoanRequest = ({ user }) => {
 
     useEffect(() => {
         // Using the specific templates endpoint we created earlier
-        axios.get("http://localhost:8080/api/loans/templates")
+        axios.get(`${process.env.REACT_APP_API_URL}/api/loans/templates`)
             .then(res => setModels(res.data))
             .catch(err => console.error("Error fetching loan models:", err));
     }, []);
@@ -27,7 +27,7 @@ const UserLoanRequest = ({ user }) => {
         };
         
         try {
-            await axios.post("http://localhost:8080/api/loans/apply", application);
+            await axios.post(`${process.env.REACT_APP_API_URL}/api/loans/apply`, application);
             alert("Loan application submitted successfully!");
         } catch (err) {
             alert("Failed to submit application: " + (err.response?.data || "Server error"));

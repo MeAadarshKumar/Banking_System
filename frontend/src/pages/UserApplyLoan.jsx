@@ -5,7 +5,7 @@ const UserApplyLoan = ({ user }) => {
     const [templates, setTemplates] = useState([]);
 
     useEffect(() => {
-        axios.get("http://localhost:8080/api/loans/templates")
+        axios.get(`${process.env.REACT_APP_API_URL}/api/loans/templates`)
             .then(res => setTemplates(res.data));
     }, []);
 
@@ -17,7 +17,7 @@ const UserApplyLoan = ({ user }) => {
             durationMonths: template.durationMonths
         };
         try {
-            await axios.post("http://localhost:8080/api/loans/apply", application);
+            await axios.post(`${process.env.REACT_APP_API_URL}/api/loans/apply`, application);
             alert("Application Submitted!");
         } catch (err) { alert("Error submitting application"); }
     };

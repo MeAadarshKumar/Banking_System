@@ -23,21 +23,21 @@ const AdminDashboard = ({ onLogout, user }) => {
 
     const fetchAllTransactions = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/api/admin/all-transactions");
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/all-transactions`);
             setAllTransactions(res.data);
         } catch (error) { console.error("Error fetching transactions", error); }
     };
 
     const fetchUsers = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/api/admin/users");
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/users`);
             setUsers(res.data);
         } catch (error) { console.error("Error fetching users:", error); }
     };
 
     const fetchPending = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/api/admin/pending-deposits");
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}:8080/api/admin/pending-deposits`);
             setPendingDeposits(res.data);
         } catch (error) { console.error("Error fetching deposits:", error); }
     };
@@ -45,8 +45,8 @@ const AdminDashboard = ({ onLogout, user }) => {
     const handleAction = async (id, action) => {
         try {
             const url = action === 'approve' 
-                ? `http://localhost:8080/api/admin/approve-deposit/${id}`
-                : `http://localhost:8080/api/admin/reject-deposit/${id}`;
+                ? `${process.env.REACT_APP_API_URL}/api/admin/approve-deposit/${id}`
+                : `${process.env.REACT_APP_API_URL}/api/admin/reject-deposit/${id}`;
             await axios.post(url);
             alert(`Deposit ${action === 'approve' ? 'Approved' : 'Rejected'}!`);
             fetchPending();
@@ -59,7 +59,7 @@ const AdminDashboard = ({ onLogout, user }) => {
     const handleDeleteUser = async (accNo) => {
         if (window.confirm(`Are you sure you want to remove account ${accNo}?`)) {
             try {
-                await axios.delete(`http://localhost:8080/api/admin/delete-user/${accNo}`);
+                await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/delete-user/${accNo}`);
                 alert("User removed successfully.");
                 fetchUsers();
             } catch (error) { alert("Delete failed."); }

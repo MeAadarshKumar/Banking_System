@@ -12,7 +12,7 @@ const UserProfileView = ({ userEmail, onBack }) => {
         const fetchDetails = async () => {
             if (!userEmail) return;
             try {
-                const response = await axios.get(`http://localhost:8080/api/user/details/${userEmail}`);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/user/details/${userEmail}`);
                 setUserData(response.data);
             } catch (err) { console.error("Profile Fetch Error"); }
             finally { setLoading(false); }

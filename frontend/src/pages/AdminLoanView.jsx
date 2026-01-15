@@ -7,7 +7,7 @@ const AdminLoanView = () => {
 
     const fetchLoans = useCallback(async () => {
         try {
-            const res = await axios.get("http://localhost:8080/api/loans/admin/all");
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/loans/admin/all`);
             // BUG FIX: Filter out the TEMPLATE row (accountNumber is "TEMPLATE" or null)
             const filtered = res.data.filter(loan => 
                 loan.accountNumber && loan.accountNumber !== "TEMPLATE"

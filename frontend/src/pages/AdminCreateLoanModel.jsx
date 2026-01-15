@@ -8,20 +8,20 @@ const AdminCreateLoanModel = () => {
     useEffect(() => { fetchTemplates(); }, []);
 
     const fetchTemplates = async () => {
-        const res = await axios.get("http://localhost:8080/api/loans/templates");
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/loans/templates`);
         setTemplates(res.data);
     };
 
     const handleCreate = async (e) => {
         e.preventDefault();
-        await axios.post("http://localhost:8080/api/loans/templates/create", formData);
+        await axios.post(`${process.env.REACT_APP_API_URL}/api/loans/templates/create`, formData);
         alert("Model Created!");
         setFormData({ principal: '', interestRate: '', durationMonths: '' });
         fetchTemplates();
     };
 
     const handleDelete = async (id) => {
-        await axios.delete(`http://localhost:8080/api/loans/templates/${id}`);
+        await axios.delete(`${process.env.REACT_APP_API_URL}/api/loans/templates/${id}`);
         fetchTemplates();
     };
 
