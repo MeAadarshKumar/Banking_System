@@ -16,8 +16,8 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(@NonNull CorsRegistry registry) {
         registry.addMapping("/**") // Apply to all endpoints
                 .allowedOrigins(
-                         Frontend_URL, // For local development
-                        "https://your-frontend-name.vercel.app" // Your production URL
+                        "http://localhost:3000", // For local development
+                        Frontend_URL // Your production URL
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
