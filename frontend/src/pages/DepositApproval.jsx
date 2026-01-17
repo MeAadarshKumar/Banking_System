@@ -1,6 +1,6 @@
 import React from 'react';
 
-const DepositApprovalView = ({ requests, onAction }) => {
+const DepositApproval = ({ requests, onAction }) => {
     return (
         <div className="form-card-container">
             <div className="form-header">
@@ -55,4 +55,4 @@ const DepositApprovalView = ({ requests, onAction }) => {
     );
 };
 
-export default DepositApprovalView;
+export default DepositApproval;
