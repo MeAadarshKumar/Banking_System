@@ -37,7 +37,7 @@ const AdminDashboard = ({ onLogout, user }) => {
 
     const fetchPending = async () => {
         try {
-            const res = await axios.get(`${process.env.REACT_APP_API_URL}:8080/api/admin/pending-deposits`);
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/pending-deposits`);
             setPendingDeposits(res.data);
         } catch (error) { console.error("Error fetching deposits:", error); }
     };
