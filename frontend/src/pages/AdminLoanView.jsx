@@ -23,26 +23,28 @@ const AdminLoanView = () => {
         return () => window.removeEventListener('focus', fetchLoans);
     }, [fetchLoans]);
 
-    // --- NEW FUNCTION TO HANDLE APPROVE/REJECT ---
     const handleStatusUpdate = async (id, status) => {
-    try {
-        // Force uppercase to match LoanStatus.valueOf(status.toUpperCase()) in backend
-        const formattedStatus = status.toUpperCase(); 
-        
-        // Use a clean URL without trailing slashes
-        const url = `${process.env.REACT_APP_API_URL}/api/loans/admin/status/${id}/${formattedStatus}`;
-        
-        // Send an empty object as the body to satisfy Axios/Spring POST requirements
-        await axios.post(url, {}); 
+        // Validation check to prevent 'undefined' calls
+        if (!id) {
+            alert("Error: Loan ID is missing.");
+            return;
+        }
 
-        alert(`Loan ${formattedStatus} successfully!`);
-        setSelectedLoan(null); 
-        fetchLoans(); 
-    } catch (error) {
-        console.error("Status update error:", error.response?.data || error.message);
-        // Providing more detail in the alert helps debugging
-        alert("Failed to update loan status: " + (error.response?.data || "Internal Error"));
-    }
+        try {
+            const formattedStatus = status.toUpperCase(); 
+            const url = `${process.env.REACT_APP_API_URL}/api/loans/admin/status/${id}/${formattedStatus}`;
+            
+            await axios.post(url, {}); 
+
+            alert(`Loan ${formattedStatus} successfully!`);
+            setSelectedLoan(null); 
+            fetchLoans(); 
+        } catch (error) {
+            console.error("Status update error:", error);
+            // Fix for [object Object] alert
+            const errorMsg = error.response?.data?.message || error.response?.data || "Internal Server Error";
+            alert("Failed to update loan status: " + errorMsg);
+        }
     };
 
     return (
@@ -65,10 +67,11 @@ const AdminLoanView = () => {
                         </thead>
                         <tbody>
                             {loans.map(loan => (
-                                <tr key={loan.id}>
+                                // Use loanId to match the Java Model
+                                <tr key={loan.loanId}>
                                     <td><span className="acc-number">{loan.accountNumber}</span></td>
-                                    <td><strong>₹{loan.principal.toLocaleString()}</strong></td>
-                                    <td><span className={`badge ${loan.status.toLowerCase()}`}>{loan.status}</span></td>
+                                    <td><strong>₹{loan.principal?.toLocaleString()}</strong></td>
+                                    <td><span className={`badge ${loan.status?.toLowerCase()}`}>{loan.status}</span></td>
                                     <td className="text-right">
                                         <button className="view-btn-small" onClick={() => setSelectedLoan(loan)}>
                                             View Details
@@ -86,26 +89,27 @@ const AdminLoanView = () => {
                     <div className="loan-detail-card" onClick={e => e.stopPropagation()}>
                         <h3>Loan Profile: {selectedLoan.accountNumber}</h3>
                         <div className="detail-grid">
-                            <p><span>Status</span> <b className={`badge ${selectedLoan.status.toLowerCase()}`}>{selectedLoan.status}</b></p>
+                            <p><span>Status</span> <b className={`badge ${selectedLoan.status?.toLowerCase()}`}>{selectedLoan.status}</b></p>
                             <p><span>Total Principal</span> <b>₹{selectedLoan.principal}</b></p>
                             <p><span>Interest Rate</span> <b>{selectedLoan.interestRate}%</b></p>
                             <p><span>EMI Amount</span> <b className="emi-text">₹{selectedLoan.emiAmount?.toFixed(2)}</b></p>
                         </div>
 
-                        {/* --- NEW ACTION BUTTONS --- */}
                         {selectedLoan.status === 'PENDING' && (
                             <div style={{display: 'flex', gap: '10px', marginTop: '20px'}}>
                                 <button 
                                     className="view-btn-small" 
                                     style={{flex: 1, background: '#2ecc71', color: 'white'}}
-                                    onClick={() => handleStatusUpdate(selectedLoan.id, 'APPROVED')}
+                                    // Mapping fixed to selectedLoan.loanId
+                                    onClick={() => handleStatusUpdate(selectedLoan.loanId, 'APPROVED')}
                                 >
                                     APPROVE
                                 </button>
                                 <button 
                                     className="remove-btn-small" 
                                     style={{flex: 1}}
-                                    onClick={() => handleStatusUpdate(selectedLoan.id, 'REJECTED')}
+                                    // Mapping fixed to selectedLoan.loanId
+                                    onClick={() => handleStatusUpdate(selectedLoan.loanId, 'REJECTED')}
                                 >
                                     REJECT
                                 </button>
