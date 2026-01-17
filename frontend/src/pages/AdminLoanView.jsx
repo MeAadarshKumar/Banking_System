@@ -25,15 +25,24 @@ const AdminLoanView = () => {
 
     // --- NEW FUNCTION TO HANDLE APPROVE/REJECT ---
     const handleStatusUpdate = async (id, status) => {
-        try {
-            await axios.post(`${process.env.REACT_APP_API_URL}/api/loans/admin/status/${id}/${status}`);
-            alert(`Loan ${status} successfully!`);
-            setSelectedLoan(null); // Close modal
-            fetchLoans(); // Refresh table
-        } catch (error) {
-            console.error("Status update error:", error);
-            alert("Failed to update loan status.");
-        }
+    try {
+        // Force uppercase to match LoanStatus.valueOf(status.toUpperCase()) in backend
+        const formattedStatus = status.toUpperCase(); 
+        
+        // Use a clean URL without trailing slashes
+        const url = `${process.env.REACT_APP_API_URL}/api/loans/admin/status/${id}/${formattedStatus}`;
+        
+        // Send an empty object as the body to satisfy Axios/Spring POST requirements
+        await axios.post(url, {}); 
+
+        alert(`Loan ${formattedStatus} successfully!`);
+        setSelectedLoan(null); 
+        fetchLoans(); 
+    } catch (error) {
+        console.error("Status update error:", error.response?.data || error.message);
+        // Providing more detail in the alert helps debugging
+        alert("Failed to update loan status: " + (error.response?.data || "Internal Error"));
+    }
     };
 
     return (
