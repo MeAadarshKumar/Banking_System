@@ -8,7 +8,6 @@ const AdminLoanView = () => {
     const fetchLoans = useCallback(async () => {
         try {
             const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/loans/admin/all`);
-            // BUG FIX: Filter out the TEMPLATE row (accountNumber is "TEMPLATE" or null)
             const filtered = res.data.filter(loan => 
                 loan.accountNumber && loan.accountNumber !== "TEMPLATE"
             );
@@ -20,10 +19,22 @@ const AdminLoanView = () => {
 
     useEffect(() => {
         fetchLoans();
-        // AUTO-REFRESH: Sync data when switching back to this tab
         window.addEventListener('focus', fetchLoans);
         return () => window.removeEventListener('focus', fetchLoans);
     }, [fetchLoans]);
+
+    // --- NEW FUNCTION TO HANDLE APPROVE/REJECT ---
+    const handleStatusUpdate = async (id, status) => {
+        try {
+            await axios.post(`${process.env.REACT_APP_API_URL}/api/loans/admin/status/${id}/${status}`);
+            alert(`Loan ${status} successfully!`);
+            setSelectedLoan(null); // Close modal
+            fetchLoans(); // Refresh table
+        } catch (error) {
+            console.error("Status update error:", error);
+            alert("Failed to update loan status.");
+        }
+    };
 
     return (
         <div className="dashboard-content">
@@ -61,7 +72,6 @@ const AdminLoanView = () => {
                 </div>
             </div>
 
-            {/* Detailed Modal View */}
             {selectedLoan && (
                 <div className="loan-detail-overlay" onClick={() => setSelectedLoan(null)}>
                     <div className="loan-detail-card" onClick={e => e.stopPropagation()}>
@@ -72,7 +82,32 @@ const AdminLoanView = () => {
                             <p><span>Interest Rate</span> <b>{selectedLoan.interestRate}%</b></p>
                             <p><span>EMI Amount</span> <b className="emi-text">₹{selectedLoan.emiAmount?.toFixed(2)}</b></p>
                         </div>
-                        <button className="logout-btn" style={{width: '100%', marginTop: '20px'}} onClick={() => setSelectedLoan(null)}>
+
+                        {/* --- NEW ACTION BUTTONS --- */}
+                        {selectedLoan.status === 'PENDING' && (
+                            <div style={{display: 'flex', gap: '10px', marginTop: '20px'}}>
+                                <button 
+                                    className="view-btn-small" 
+                                    style={{flex: 1, background: '#2ecc71', color: 'white'}}
+                                    onClick={() => handleStatusUpdate(selectedLoan.id, 'APPROVED')}
+                                >
+                                    APPROVE
+                                </button>
+                                <button 
+                                    className="remove-btn-small" 
+                                    style={{flex: 1}}
+                                    onClick={() => handleStatusUpdate(selectedLoan.id, 'REJECTED')}
+                                >
+                                    REJECT
+                                </button>
+                            </div>
+                        )}
+
+                        <button 
+                            className="logout-btn" 
+                            style={{width: '100%', marginTop: '10px', background: '#666'}} 
+                            onClick={() => setSelectedLoan(null)}
+                        >
                             Close Preview
                         </button>
                     </div>
